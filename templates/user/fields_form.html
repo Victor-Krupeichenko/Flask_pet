@@ -1,0 +1,13 @@
+{{ form.hidden_tag() }} <!--CSRF token-->
+{% for field in form %}
+    {% if field.type not in ["SubmitField", "CSRFTokenField"] %}
+        <!--{{ field.label(class="form-label") }}-->
+        {% if response.user_update %}
+            {{ field(class="form-control", value=update_current_user|attr(field.name)) }}
+            <br>
+        {% else %}
+            {{ field(class="form-control") }}
+            <br>
+        {% endif %}
+    {% endif %}
+{% endfor %}
