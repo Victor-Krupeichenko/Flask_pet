@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+
+
+{% block contet %}
+    <div class="text-center">
+        <img src="{{ url_for('static', filename='images/update_user.png') }}" width="100" alt="">
+        <h3>{{ response.title }}</h3>
+    </div>
+    <form action="" method="post">
+        {% include 'user/fields_form.html' %}
+        <div class="d-grid gap-2">
+            {{ form.submit(class="btn btn-secondary btn-sm btn-block", value="Update") }}
+        </div>
+    </form>
+{% endblock %}
