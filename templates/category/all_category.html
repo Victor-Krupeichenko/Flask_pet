@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+
+
+
+{% block contet %}
+    {% include 'category/category_title.html' %}
+    <br>
+    <div class="d-grid gap-2 text-center mt-2">
+        <a href="{{ url_for('category.create_category') }}"
+           class="btn btn-secondary btn-sm">Create Category</a>
+    </div>
+    <br>
+    <table class="table">
+        <thead>
+        <tr class="text-center">
+            <th scope="col">#</th>
+            <th scope="col">Title</th>
+            <th scope="col">Count Post</th>
+            <th scope="col">Update Category</th>
+            <th scope="col">Delete Category</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for category in categories %}
+            <tr class="text-center">
+                <th scope="row">{{ loop.index }}</th>
+                <td>{{ category[1] }}</td>
+                <td>{{ category[2] }}</td>
+                <td>
+                    <div class="d-grid gap-2 text-center mt-2">
+                        <a href="{{ url_for('category.update_category', category_id=category[0]) }}"
+                           class="btn btn-info btn-sm">Update</a>
+                    </div>
+                </td>
+                <td>
+                    <div class="d-grid gap-2 text-center mt-2">
+                        <a href="{{ url_for('category.delete_category', category_id=category[0]) }}"
+                           class="btn btn-danger btn-sm">Delete</a>
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
