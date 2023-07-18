@@ -38,7 +38,7 @@ class User(Base, UserMixin):
         return pbkdf2_sha256.verify(form_password, self.password)
 
 
-class Post(Base):
+class Post(Base, UserMixin):
     """Model Post"""
     __tablename__ = "post"
     id = Column(Integer, primary_key=True)
@@ -50,7 +50,7 @@ class Post(Base):
     category_id = Column(Integer, ForeignKey("category.id"))
 
 
-class Category(Base):
+class Category(Base, UserMixin):
     """Model Category"""
     __tablename__ = "category"
     id = Column(Integer, primary_key=True)
