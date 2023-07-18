@@ -13,6 +13,16 @@
                     <li class="nav-item">
                         <a class="nav-link active">Welcome, {{ current_user.username }}</a>
                     </li>
+                    {% if current_user.group == 'admin' %}
+                        <li class="nav-item">
+                            <a class="nav-link {% if response.category_create %}active{% endif %}"
+                               href="{{ url_for('category.create_category') }}">Admin: Create Category</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if response.all_category %}active{% endif %}"
+                               href="{{ url_for('category.all_categories') }}">Admin: All Category</a>
+                        </li>
+                    {% endif %}
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('user.user_logout') }}">Logout</a>
                     </li>
@@ -23,6 +33,10 @@
                     <li class="nav-item">
                         <a class="nav-link"
                            href="{{ url_for('user.user_delete', user_id=current_user.id) }}">User Delete</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if response.create_post %}active{% endif %}"
+                           href="{{ url_for('post.create_post') }}">Create Post</a>
                     </li>
                 {% else %}
                     <li class="nav-item">
@@ -35,9 +49,10 @@
                     </li>
                 {% endif %}
             </ul>
-            <form class="d-flex" role="search">
-                <input class="form-control me-2" type="search" placeholder="Поиск" aria-label="Поиск">
-                <button class="btn btn-outline-success" type="submit">Поиск</button>
+            <form action="{{ url_for('post.search') }}" method="post" class="d-flex">
+                {{ form.hidden_tag() }} <!--CSRF token-->
+                <input class="form-control me-2" type="search" name="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-outline-secondary" type="submit">Search</button>
             </form>
         </div>
     </div>
