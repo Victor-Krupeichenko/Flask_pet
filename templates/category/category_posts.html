@@ -1,0 +1,16 @@
+{% for category in request.categories %}
+    <ol class="list-group">
+        <li class="list-group-item d-flex justify-content-between align-items-start">
+            <div class="md-2 me-auto">
+                <div>
+                    <a class="btn btn-warning btn-sm btn-block"
+                       href="{{ url_for('category.posts_category', category_id=category.id) }}">
+                        {{ category.title }}
+                    </a>
+                </div>
+            </div>
+
+            <span class="badge bg-warning rounded-pill">{{ category.post_count }}</span>
+        </li>
+    </ol>
+{% endfor %}
