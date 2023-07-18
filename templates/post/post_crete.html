@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block category %}
+    {% include 'category/category_posts.html' %}
+{% endblock %}
+
+{% block contet %}
+    <form action="" method="post">
+        {% include 'post/post_title.html' %}
+        {{ form.hidden_tag() }} <!--CSRF token-->
+        {% for field in form %}
+            {% if field.type not in ["SubmitField", "CSRFTokenField"] %}
+                {% if response.update_post %}
+                    {% if field.type == "SelectField" %}
+                        {{ form.category_id(class='form-control') }}
+                    {% else %}
+                        {{ field(class='form-control', value=update_current_post|attr(field.name)) }}
+                    {% endif %}
+                {% else %}
+                    {{ field(class='form-control', placeholder=field.name|title) }}
+                {% endif %}
+                <br>
+            {% endif %}
+        {% endfor %}
+        <div class="d-grid gap-2">
+            {% if response.update_post %}
+                {{ form.submit(class="btn btn-secondary btn-sm btn-block", value="Update Post") }}
+            {% else %}
+                {{ form.submit(class="btn btn-secondary btn-sm btn-block", value="Create Post") }}
+            {% endif %}
+        </div>
+    </form>
+{% endblock %}
