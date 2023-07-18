@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+
+{% block contet %}
+    <form action="" method="post">
+        {% include 'category/category_title.html' %}
+        {{ form.hidden_tag() }}
+        {% if response.update_category %}
+            {{ form.title(class='form-control', value=update.title) }}
+            <br>
+            <div class="d-grid gap-2">
+                {{ form.submit(class="btn btn-secondary btn-sm btn-block", value="Update Category") }}
+            </div>
+        {% else %}
+            {{ form.title(class='form-control', placeholder='Title') }}
+            <br>
+            <div class="d-grid gap-2">
+                {{ form.submit(class="btn btn-secondary btn-sm btn-block") }}
+            </div>
+        {% endif %}
+    </form>
+{% endblock %}
