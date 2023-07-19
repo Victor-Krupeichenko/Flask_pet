@@ -3,8 +3,11 @@
     {% include 'category/category_posts.html' %}
 {% endblock %}
 {% block contet %}
+    {% if search_query %}
+        <h6>Found: {{ response.total_pages }}</h6>
+    {% endif %}
     <div class="row row-cols-1 row-cols-md-3 g-3">
-        {% for post in results %}
+        {% for post in response.results %}
             <div class="col">
                 <div class="card h-100">
                     <div class="card-body">
@@ -19,5 +22,10 @@
                 </div>
             </div>
         {% endfor %}
+    </div>
+    <div class="text-center mt-5">
+        {% if response.show_pagination %}
+            {% include 'pagination.html' %}
+        {% endif %}
     </div>
 {% endblock %}
