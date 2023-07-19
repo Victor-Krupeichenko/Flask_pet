@@ -1,0 +1,30 @@
+<nav aria-label="...">
+    <ul class="pagination pagination-md">
+        {% if page > 1 %}
+            <li class="page-item">
+                <a class="page-link"
+                   href="?page={{ page - 1 }}{% if search_query %}&search={{ search_query }}{% endif %}">Previous</a>
+            </li>
+        {% endif %}
+        {% for item in range(1, response.total_pages + 1) %}
+            {% if page == item %}
+                <li class="page-item active" aria-current="page">
+                    <a class="page-link"
+                       href="?page={{ item }}{% if search_query %}&search={{ search_query }}{% endif %}">{{ item }}</a>
+                </li>
+            {% elif item > (page - 3) and item < (page + 3) %}
+                <li class="page-item">
+                    <a class="page-link"
+                       href="?page={{ item }}{% if search_query %}&search={{ search_query }}{% endif %}">{{ item }}</a>
+                </li>
+            {% endif %}
+        {% endfor %}
+        {% set end = ((page + 1) if (page + 1) <= response.total_pages else response.total_pages) %}
+        {% if end < response.total_pages %}
+            <li class="page-item">
+                <a class="page-link"
+                   href="?page={{ page + 1 }}{% if search_query %}&search={{ search_query }}{% endif %}">Next</a>
+            </li>
+        {% endif %}
+    </ul>
+</nav>
