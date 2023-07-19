@@ -1,9 +1,10 @@
 from flask import Blueprint, render_template, url_for, request, redirect, flash
 from flask_login import login_required
 from category.forms import CategoryForm
-from app_database.db_connect import session_maker
+from app_database.db_connect import session_maker, limit
 from sqlalchemy import func, select
 from app_database.models import Category, Post
+from post.routers import my_range, pagination
 from user.routers import get_errors, get_error_database_flash_message
 
 category = Blueprint("category", __name__, static_folder="static", template_folder="templates")
@@ -56,15 +57,19 @@ def all_categories():
 
 @category.route("/posts-category/<int:category_id>")
 def posts_category(category_id):
+    """Posts by category"""
     with session_maker() as db_session:
         try:
             title = db_session.get(Category, category_id)
-            results = db_session.scalars(
+            query = db_session.scalars(
                 select(Post).filter(Post.category_id == category_id).filter(Post.publish)).all()
-            response = {
-                "title": title.title
-            }
-            return render_template("post/index.html", results=results, response=response)
+            total_posts = len(query)
+            title_page = title.title
+            start, end, page = my_range(limit)
+            response = pagination(
+                _limit=limit, total_posts=total_posts, query=query, title_page=title_page, start=start, end=end
+            )
+            return render_template("post/index.html", response=response, page=page)
         except Exception as ex:
             get_error_database_flash_message(error=ex, db_session=db_session)
             return redirect(url_for("index"))
