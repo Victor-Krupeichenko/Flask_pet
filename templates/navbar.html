@@ -49,9 +49,10 @@
                     </li>
                 {% endif %}
             </ul>
-            <form action="{{ url_for('post.search') }}" method="post" class="d-flex">
+            <form action="{{ url_for('post.search') }}" method="get" class="d-flex">
                 {{ form.hidden_tag() }} <!--CSRF token-->
-                <input class="form-control me-2" type="search" name="search" placeholder="Search" aria-label="Search">
+                <input class="form-control me-2" type="search" name="search" placeholder="Search" aria-label="Search"
+                       value="{{ search_query }}">
                 <button class="btn btn-outline-secondary" type="submit">Search</button>
             </form>
         </div>
