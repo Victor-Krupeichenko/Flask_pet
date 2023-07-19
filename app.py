@@ -1,4 +1,4 @@
-from flask import Flask, redirect, url_for, request
+from flask import Flask, redirect, url_for, request, render_template
 from sqlalchemy import func
 from user.routers import user
 from flask_login import LoginManager
@@ -57,3 +57,21 @@ def base():
 def format_time(value):
     """Time Filter"""
     return value.strftime('%d-%m-%Y %H:%M')
+
+
+@app.errorhandler(404)
+def page_not_found(error):
+    """Page 404"""
+    response = {
+        "title": "Page Not Found"
+    }
+    return render_template("page_404.html", response=response), 404
+
+
+@app.errorhandler(500)
+def page_error_server(error):
+    """Page 500"""
+    response = {
+        "title": "Server Error"
+    }
+    return render_template("page_500.html", response=response), 500
