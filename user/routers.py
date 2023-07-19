@@ -19,6 +19,18 @@ def get_data_form_fields(form) -> dict:
     return user_data
 
 
+def get_errors(form, category_error="danger"):
+    """Errors Fields"""
+    for field, error in form.errors.items():
+        flash(message=f"Error: field - {error.pop(0)}", category=category_error)
+
+
+def get_error_database_flash_message(error, db_session, category_error="danger"):
+    """Errors Database"""
+    db_session.rollback()
+    flash(message=f"Error: Connect Database -> {error}", category=category_error)
+
+
 @user.route("/regiser-user", methods=["POST", "GET"])
 def user_register():
     """Register user"""
@@ -41,12 +53,10 @@ def user_register():
                     flash(message="User create", category="success")
                     return redirect(url_for("index"))
                 except Exception as ex:
-                    db_session.rollback()
-                    flash(message=f"Error: Connect Database -> {ex}", category="danger")
+                    get_error_database_flash_message(error=ex, db_session=db_session)
                     return render_template("user/register_user.html", response=response, form=form)
         else:
-            for field, error in form.errors.items():
-                flash(message=f"Error: field - {error.pop(0)}", category="danger")
+            get_errors(form)
     return render_template("user/register_user.html", response=response, form=form)
 
 
@@ -77,12 +87,10 @@ def user_login():
                             flash(message="Incorrect password", category="danger")
                             return render_template("user/login_user.html", response=response, form=form)
                 except Exception as ex:
-                    db_session.rollback()
-                    flash(message=f"Error: Connect Database -> {ex}", category="danger")
+                    get_error_database_flash_message(error=ex, db_session=db_session)
                     return render_template("user/login_user.html", response=response, form=form)
         else:
-            for field, error in form.errors.items():
-                flash(message=f"Error: field - {error.pop(0)}", category="danger")
+            get_errors(form)
     return render_template("user/login_user.html", response=response, form=form)
 
 
@@ -117,13 +125,10 @@ def user_update():
                     flash(message="User Update Successfully", category="success")
                     return redirect(url_for("index"))
                 except Exception as ex:
-                    db_session.rollback()
-                    flash(message=f"Error: Connect Database -> {ex}", category="danger")
+                    get_error_database_flash_message(error=ex, db_session=db_session)
                     return redirect(url_for("user.user_update"))
             else:
-                for field, error in form.errors.items():
-                    flash(message=f"Error: field - {error.pop(0)}", category="danger")
-
+                get_errors(form)
     return render_template(
         "user/update_user.html", response=response, form=form, update_current_user=update_current_user
     )
@@ -142,5 +147,5 @@ def user_delete(user_id):
             flash(message=f"User {username} deleted", category="info")
             return redirect(url_for("index"))
         except Exception as ex:
-            flash(message=f"Error: Connect Database -> {ex}", category="danger")
+            get_error_database_flash_message(error=ex, db_session=db_session)
             return redirect(url_for("index"))
