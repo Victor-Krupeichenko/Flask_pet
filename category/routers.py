@@ -4,6 +4,7 @@ from category.forms import CategoryForm
 from app_database.db_connect import session_maker
 from sqlalchemy import func, select
 from app_database.models import Category, Post
+from user.routers import get_errors, get_error_database_flash_message
 
 category = Blueprint("category", __name__, static_folder="static", template_folder="templates")
 
@@ -28,12 +29,10 @@ def create_category():
                     flash(message=f"Category: {title} Successfully added", category="success")
                     return redirect(url_for('category.all_categories'))
                 except Exception as ex:
-                    db_session.rollback()
-                    flash(message=f"Error: Connect Database -> {ex}", category="danger")
+                    get_error_database_flash_message(error=ex, db_session=db_session)
                     return render_template("category/create_category.html", form=form, response=response)
         else:
-            for field, error in form.errors.items():
-                flash(message=f"Error: field - {error.pop(0)}", category="danger")
+            get_errors(form)
     return render_template("category/create_category.html", response=response, form=form)
 
 
@@ -50,8 +49,8 @@ def all_categories():
             category_all = db_session.query(Category.id, Category.title, func.count(Post.id)).outerjoin(Post).group_by(
                 Category.id, Category.title).all()
         except Exception as ex:
-            db_session.rollback()
-            flash(message=f"Error: Connect Database -> {ex}", category="danger")
+            get_error_database_flash_message(error=ex, db_session=db_session)
+            return redirect(url_for("category.all_categories"))
         return render_template('category/all_category.html', response=response, categories=category_all)
 
 
@@ -67,7 +66,7 @@ def posts_category(category_id):
             }
             return render_template("post/index.html", results=results, response=response)
         except Exception as ex:
-            flash(message=f"Error connect database {ex}", category="danger")
+            get_error_database_flash_message(error=ex, db_session=db_session)
             return redirect(url_for("index"))
 
 
@@ -89,12 +88,10 @@ def update_category(category_id):
                 flash(message=f"Category: {update.title} Update!", category="success")
                 return redirect(url_for("category.all_categories"))
             except Exception as ex:
-                db_session.rollback()
-                flash(message=f"Error: Connect Database -> {ex}", category="danger")
+                get_error_database_flash_message(error=ex, db_session=db_session)
                 return render_template("category/create_category.html", form=form, response=response)
         else:
-            for field, error in form.errors.items():
-                flash(message=f"Error: field - {error.pop(0)}", category="danger")
+            get_errors(form)
     return render_template("category/create_category.html", response=response, form=form, update=update)
 
 
@@ -111,6 +108,5 @@ def delete_category(category_id):
             flash(message=f"Category {title} Deleted", category="info")
             return redirect(url_for("category.all_categories"))
         except Exception as ex:
-            db_session.rollback()
-            flash(message=f"Error: Connect Database -> {ex}", category="danger")
-    return redirect(url_for("category.all_categories"))
+            get_error_database_flash_message(error=ex, db_session=db_session)
+            return redirect(url_for("category.all_categories"))
