@@ -1,0 +1,31 @@
+version: "3.7"
+services:
+  flask_database:
+    image: postgres:14-alpine
+    container_name: app_flask_db
+    command: -p 1221
+    ports:
+      - "5432:1221"
+    restart: always
+    env_file:
+      - .env
+    networks:
+      - app_flask_network
+  app:
+    build:
+      context: .
+    container_name: app_flask
+    restart: always
+    env_file:
+      - .env
+    command: [ "/app/docker_start_app/start.sh" ]
+    ports:
+      - "5000:5000"
+    depends_on:
+      - flask_database
+    networks:
+      - app_flask_network
+networks:
+  app_flask_network:
+    name: app_flask_network
+    driver: bridge
