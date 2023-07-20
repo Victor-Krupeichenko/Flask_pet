@@ -75,3 +75,7 @@ def page_error_server(error):
         "title": "Server Error"
     }
     return render_template("page_500.html", response=response), 500
+
+
+if __name__ == "__main__":
+    app.run()
