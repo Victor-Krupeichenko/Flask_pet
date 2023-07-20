@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, url_for, redirect, flash, abort
 from math import ceil
-from app_database.models import Post
+from app_database.models import Post, Category
 from app_database.db_connect import session_maker, limit
 from flask_login import login_required, current_user
 from post.forms import PostForm, SearchForm
@@ -25,27 +25,31 @@ def get_post_form_data(form):
 @login_required
 def create_post():
     """Create Post"""
-    response = {
-        "title": "Create Post",
-        "create_post": True,
-    }
     form = PostForm()
+    with session_maker() as db_session:
+        categories = db_session.scalars(select(Category)).all()
+    # Установите choices для поля category_id после создания формы, но до его валидации
+    form.category_id.choices = [(category.id, category.title) for category in categories]
     if request.method == "POST":
+        form_data = get_post_form_data(form)
         if form.validate_on_submit():
-            form_data = get_post_form_data(form)
             try:
-                with session_maker() as db_session:
-                    create = Post(**form_data)
-                    db_session.add(create)
-                    db_session.commit()
-                    flash(message="Post added successfully", category="success")
-                    return redirect(url_for("index"))
+                create = Post(**form_data)
+                db_session.add(create)
+                db_session.commit()
+                flash(message="Post added successfully", category="success")
+                return redirect(url_for("index"))
             except Exception as ex:
                 get_error_database_flash_message(error=ex, db_session=db_session)
                 return redirect(url_for("post.create_post"))
         else:
             get_errors(form)
-    return render_template("post/post_crete.html", response=response, form=form)
+
+    response = {
+        "title": "Create Post",
+        "create_post": True,
+    }
+    return render_template("post/post_crete.html", response=response, form=form, categories=categories)
 
 
 def pagination(_limit, total_posts, query, title_page, start, end):
@@ -111,12 +115,14 @@ def update_post(post_id):
     form = PostForm()
     with session_maker() as db_session:
         try:
+            categories = db_session.scalars(select(Category)).all()
             update_current_post = db_session.get(Post, post_id)
             form.content.data = update_current_post.content  # Field TextArea
             response = {
                 "title": f"Update: {update_current_post.title}",
                 "update_post": True
             }
+            form.category_id.choices = [(category.id, category.title) for category in categories]
             if request.method == "POST":
                 if form.validate_on_submit():
                     form.content.data = request.form.get("content")  # Field TextArea
@@ -134,7 +140,7 @@ def update_post(post_id):
             get_error_database_flash_message(error=ex, db_session=db_session)
             return redirect(url_for('post.update_post'))
         return render_template('post/post_crete.html', response=response, form=form,
-                               update_current_post=update_current_post)
+                               update_current_post=update_current_post, categories=categories)
 
 
 @post.route("/delete-post/<int:post_id>")
